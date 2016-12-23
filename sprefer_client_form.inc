@@ -169,6 +169,7 @@ function sprefer_client_form_submit($form, &$form_state) {
         ctools_add_js('ajax-responder');
         $data = array(
           'name' => $values['name'],
+          'machine_name' => $sprefer->machine_name,
         );
         $hash = sprefer_hash($data, TRUE);
         $commands[] = ctools_ajax_command_redirect('sprefer/success', 0, array(

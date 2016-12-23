@@ -29,7 +29,6 @@ function sprefer_admin_form($form, &$form_state) {
   $form['sprefer_blocks'] = array(
     '#type' => 'fieldset',
     '#title' => 'SP Refer blokken',
-    '#description' => '<p>De volgende tokens zijn bruikbaar in het onderwerp en de tekst van de email:<br/>[name], [email], [telephone], [postal_code], [house_number], [street], [city], [hash], [contact_id].',
   );
 
   $options = sprefer_get_refer_forms_list();
@@ -61,12 +60,26 @@ function sprefer_admin_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => 'E-mail onderwerp',
     '#maxlength' => 255,
+    '#description' => '<p>De volgende tokens zijn bruikbaar:<br/>[name], [email], [telephone], [postal_code], [house_number], [street], [city], [hash], [contact_id].',
   );
 
   $form['sprefer_blocks']['mail_text'] = array(
     '#type' => 'textarea',
     '#title' => 'E-mail tekst',
-    '#description' => 'Deze tekst wordt verzonden naar de inzenders van het formulier. Gebruik [hash] op de plek waar de persoonelijke hash code moet worden ingevoegd.',
+    '#description' => '<p>De volgende tokens zijn bruikbaar:<br/>[name], [email], [telephone], [postal_code], [house_number], [street], [city], [hash], [contact_id].',
+  );
+
+  $form['sprefer_blocks']['feedback_page_title'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Feedback pagina titel',
+    '#maxlength' => 255,
+    '#description' => '<p>De volgende tokens zijn bruikbaar:<br/>[name].',
+  );
+
+  $form['sprefer_blocks']['feedback_page_text'] = array(
+    '#type' => 'textarea',
+    '#title' => 'Feedback pagina tekst',
+    '#description' => '<p>De volgende tokens zijn bruikbaar:<br/>[name].',
   );
 
   $form['sprefer_blocks']['blocks_submit'] = array(
@@ -86,6 +99,8 @@ function sprefer_admin_form($form, &$form_state) {
     $form_state['input']['machine_name'] = $sprefer->machine_name;
     $form_state['input']['mail_text'] = $sprefer->mail_text;
     $form_state['input']['mail_subject'] = $sprefer->mail_subject;
+    $form_state['input']['feedback_page_text'] = $sprefer->feedback_page_text;
+    $form_state['input']['feedback_page_title'] = $sprefer->feedback_page_title;
     $form['sprefer_blocks']['blocks_submit']['#value'] = 'Sla op';
   }
   else {
@@ -93,6 +108,8 @@ function sprefer_admin_form($form, &$form_state) {
     $form_state['input']['machine_name'] = '';
     $form_state['input']['mail_text'] = '';
     $form_state['input']['mail_subject'] = '';
+    $form_state['input']['feedback_page_text'] = '';
+    $form_state['input']['feedback_page_title'] = '';
     $form['sprefer_blocks']['blocks_submit']['#value'] = 'Voeg toe';
   }
   
@@ -138,16 +155,20 @@ function sprefer_admin_form_submit($form, &$form_state) {
           'display_name' => $values['display_name'],
           'machine_name' => $values['machine_name'],
           'disabled' => 0,
-          'mail_text' => $values['mail_text'],
           'mail_subject' => $values['mail_subject'],
+          'mail_text' => $values['mail_text'],
+          'feedback_page_title' => $values['feedback_page_title'],
+          'feedback_page_text' => $values['feedback_page_text'],
         ));
         $result = entity_save('sprefer_form', $refer_form);
       }
       else {
         $sprefer = sprefer_get_sprefer($machine_name);
         $sprefer->display_name = $values['display_name'];
-        $sprefer->mail_text = $values['mail_text'];
         $sprefer->mail_subject = $values['mail_subject'];
+        $sprefer->mail_text = $values['mail_text'];
+        $sprefer->feedback_page_title = $values['feedback_page_title'];
+        $sprefer->feedback_page_text = $values['feedback_page_text'];
         $result = entity_save('sprefer_form', $sprefer);
       }
       if ($result === FALSE) {
