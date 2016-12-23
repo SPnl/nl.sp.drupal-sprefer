@@ -55,6 +55,17 @@ function sprefer_schema() {
         'size' => 'normal',
         'not null' => FALSE,
       ),
+      'feedback_page_title' => array(
+        'description' => 'Title for the feedback page.',
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'feedback_page_text' => array(
+        'description' => 'Text for the feedback page.',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+      ),
     ),
     'primary key' => array(
       'id',
@@ -67,4 +78,23 @@ function sprefer_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Add confirmation page text and title to sprefer_form table.
+ */
+function sprefer_update_7001() {
+  $spec = array(
+      'description' => 'Title for the feedback page.',
+      'type' => 'varchar',
+      'length' => '255',
+      );
+  db_add_field( 'sprefer_form', 'feedback_page_title', $spec);
+  $spec = array(
+      'description' => 'Text for the feedback page.',
+      'type' => 'text',
+      'size' => 'normal',
+      'not null' => FALSE,
+      );
+  db_add_field( 'sprefer_form', 'feedback_page_text', $spec);
 }
