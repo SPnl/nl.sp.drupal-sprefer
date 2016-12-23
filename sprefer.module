@@ -156,7 +156,7 @@ function sprefer_form_ajax_callback($form, &$form_state) {
 function sprefer_result() {
   $params = drupal_get_query_parameters();
   $data = sprefer_unhash($params['data']);
-  return '<p>Geslaagd</p><pre>' . print_r($data, TRUE) . '</pre>';
+  return '<p>Beste ' . $data['name'] . ', we hebben je zojuist een e-mail gestuurd met daarin een link die je aan je vrienden kan doorgeven om chocolade aan te vragen.</p>';
 }
 
 function sprefer_hash($data) {
