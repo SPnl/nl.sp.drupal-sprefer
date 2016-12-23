@@ -155,23 +155,27 @@ function sprefer_form_ajax_callback($form, &$form_state) {
 
 function sprefer_result() {
   $params = drupal_get_query_parameters();
-  $data = sprefer_unhash($params['data']);
+  $data = sprefer_unhash($params['data'], TRUE);
   return '<p>Beste ' . $data['name'] . ', we hebben je zojuist een e-mail gestuurd met daarin een link die je aan je vrienden kan doorgeven om chocolade aan te vragen.</p>';
 }
 
-function sprefer_hash($data) {
-  $data_serialized = serialize($data);
+function sprefer_hash($data, $serialize = FALSE) {
+  if ($serialize) {
+    $data = serialize($data);
+  }
   $key = variable_get('sp_decrypt_rid_key');
-  $encrypted = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $data_serialized, MCRYPT_MODE_ECB);
+  $encrypted = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $data, MCRYPT_MODE_ECB);
   $hash = base64_encode($encrypted);
   return $hash;
 }
 
-function sprefer_unhash($hash) {
+function sprefer_unhash($hash, $unserialize = FALSE) {
   $decoded = base64_decode($hash);
   $key = variable_get('sp_decrypt_rid_key');
-  $data_serialized = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $decoded, MCRYPT_MODE_ECB);
-  $data = unserialize($data_serialized);
+  $data = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $decoded, MCRYPT_MODE_ECB);
+  if ($userialze) {
+    $data = unserialize($data);
+  }
   return $data;
 }
 

@@ -170,7 +170,7 @@ function sprefer_client_form_submit($form, &$form_state) {
         $data = array(
           'name' => $values['name'],
         );
-        $hash = sprefer_hash($data);
+        $hash = sprefer_hash($data, TRUE);
         $commands[] = ctools_ajax_command_redirect('sprefer/success', 0, array(
           'query' => array(
             'data' => $hash,
