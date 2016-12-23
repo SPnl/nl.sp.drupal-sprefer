@@ -173,7 +173,7 @@ function sprefer_unhash($hash, $unserialize = FALSE) {
   $decoded = base64_decode($hash);
   $key = variable_get('sp_decrypt_rid_key');
   $data = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $decoded, MCRYPT_MODE_ECB);
-  if ($userialze) {
+  if ($unserialize) {
     $data = unserialize($data);
   }
   return $data;
