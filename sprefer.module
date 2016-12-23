@@ -1,0 +1,188 @@
+<?php
+
+  module_load_include("inc", "sprefer", "sprefer_client_form");
+  module_load_include("inc", "sprefer", "sprefer_pro6pp");
+
+/**
+ * Implements hook_menu().
+ */
+function sprefer_menu() {
+
+  $items['admin/config/sp/refer'] = array(
+    'title' => 'SP Refer instellingen',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sprefer_admin_form'),
+    'file' => 'sprefer_admin_form.inc',
+    'access arguments' => array('administer_sprefer'),
+  );
+
+  $items['admin/config/sp/refer/settings'] = array(
+    'title' => 'SP Refer Formulieren',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => '0',
+    'access arguments' => array('administer_sprefer'),
+  );
+
+  $items['sprefer/success'] = array(
+    'title' => 'Mail verzonden',
+    'page callback' => 'sprefer_result',
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/*
+ * Implements hook_permission().
+ */
+function sprefer_permission() {
+  return array(
+    'administer_sprefer' => array(
+      'title' => 'Beheer SP Refer Formulieren',
+    ),
+  );
+}
+
+/**
+ *  * Implements hook_block_info().
+ *   */
+function sprefer_block_info() {
+  $blocks = array();
+  $list = sprefer_get_refer_forms_list();
+  foreach ($list as $machine_name => $display_name) {
+    $blocks[$machine_name] = array(
+      'info' => 'SP Refer formulier: ' . check_plain($display_name),
+    );
+  }
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function sprefer_block_view($delta = '') {
+  $list = sprefer_get_refer_forms_list();
+  $block = array();
+
+  foreach ($list as $machine_name => $display_name) {
+    if ($delta === $machine_name) {
+      $block = array(
+        'subject' => '',
+        'content' => drupal_get_form('sprefer_client_form', $machine_name),
+      );
+    }
+  }
+  return $block;
+}
+
+function sprefer_block_content($machine_name) {
+  $sprefer = sprefer_get_sprefer($machine_name);
+  return '<p>' . check_plain($sprefer->display_name) . '</p>';
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function sprefer_entity_info() {
+  $info = array();
+  $info['sprefer_form'] = array(
+    'label' => 'Referal form',
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'sprefer_form',
+    'entity keys' => array(
+      'id' => 'id',
+    ),
+    'fieldable' => FALSE,
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function campaign_entity_property_info_alter(&$info) {
+  $tables = array(
+    'sprefer_form',
+  );
+  foreach ($tables as $table) {
+    $properties = &$info[$table]['properties'];
+    foreach (array_keys($properties) as $key) {
+      if ($key == 'id') {
+        continue;
+      }
+      $properties[$key] += array(
+        'setter callback' => 'entity_property_verbatim_set',
+      );
+    }
+  }
+}
+
+function sprefer_get_sprefer($machine_name) {
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', 'sprefer_form')
+    ->propertyCondition('machine_name', $machine_name)
+    -> execute();
+
+  if (isset($result['sprefer_form'])) {
+    $sprefer_id = current(array_keys($result['sprefer_form']));
+    $sprefer = entity_load_single('sprefer_form', $sprefer_id);
+    return $sprefer;
+  } 
+  return FALSE;
+}
+
+function sprefer_get_refer_forms_list() {
+  $list = array();
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', 'sprefer_form')
+    -> execute();
+  if (isset($result['sprefer_form'])) {
+    $form_ids = array_keys($result['sprefer_form']);
+    $forms = entity_load('sprefer_form', $form_ids);
+    foreach ($forms as $form) {
+      $list[$form->machine_name] = $form->display_name;
+    }
+  } 
+  return $list;
+}
+
+function sprefer_form_ajax_callback($form, &$form_state) {
+  return $form;
+}
+
+function sprefer_result() {
+  $params = drupal_get_query_parameters();
+  $data = sprefer_unhash($params['data']);
+  return '<p>Geslaagd</p><pre>' . print_r($data, TRUE) . '</pre>';
+}
+
+function sprefer_hash($data) {
+  $data_serialized = serialize($data);
+  $key = 'abcdabcdabcdabcd';
+  $encrypted = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $data_serialized, MCRYPT_MODE_ECB);
+  $hash = base64_encode($encrypted);
+  return $hash;
+}
+
+function sprefer_unhash($hash) {
+  $decoded = base64_decode($hash);
+  $key = 'abcdabcdabcdabcd';
+  $data_serialized = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $decoded, MCRYPT_MODE_ECB);
+  $data = unserialize($data_serialized);
+  return $data;
+}
+
+function sprefer_mail($key, &$message, $params) {
+  switch ($key) {
+  case 'client_mail':
+    $message['subject'] = $params['mail_subject'];
+    $message['body'][] = $params['mail_text'];
+    $message['body'][] = $params['name'];
+    $message['body'][] = $params['contact_id'];
+    $message['body'][] = $params['hash'];
+    break;
+  }
+}

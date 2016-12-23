@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * Implements hook_install()
+ */
+function spbellen_install() {
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function spbellen_uninstall() {
+  // Remove any variables we created.
+  //variable_del('');
+}
+
+/**
+ * Implements hook_schema().
+ */
+function sprefer_schema() {
+  $schema['sprefer_form'] = array(
+    'description' => 'Referal form',
+    'fields' => array(
+      'id' => array(
+        'description' => 'Primary key.',
+        'type' => 'serial',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'machine_name' => array(
+        'description' => 'Block machine name.',
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'display_name' => array(
+        'description' => 'Block display name.',
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'disabled' => array(
+        'description' => 'Wether the campaign is disabled.',
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 0,
+        'not null' => TRUE,
+      ),
+      'mail_subject' => array(
+        'description' => 'Email subject',
+        'type' => 'varchar',
+        'length' => '255',
+      ),
+      'mail_text' => array(
+        'description' => 'Email text.',
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array(
+      'id',
+    ),
+    'unique keys' => array(
+      'machine_name' => array(
+        'machine_name',
+      ),
+    ),
+  );
+
+  return $schema;
+}

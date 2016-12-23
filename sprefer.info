@@ -1,0 +1,8 @@
+name = SP Refer
+description = Deze module maakt het mogelijk aanmeldformulieren te genereren waarmee mensen een gepersonaliseerde link kunnen aanvragen die ze aan anderen kunnen doorgeven. Deze link wordt gepersonaliseerd door een parameter mee te geven in de url die herleid kan worden tot het contactid in CiviCRM.
+core = 7.x
+package = sprbs
+dependencies[] = sprbs
+dependencies[] = spciviapi
+dependencies[] = spwebform_email_verify
+dependencies[] = spcivipush
