@@ -108,7 +108,7 @@ function sprefer_client_form_validate($form, &$form_state) {
 
   // Check phone.
   $regex_telephone_fixed = '/^(((0)[1-9]{2}[0-9][-]?[1-9][0-9]{5})|((\\+31|0|0031)[1-9][0-9][-]?[1-9][0-9]{6}))$/';
-  $regex_telephone_mobile = '/^(((\\+31|0|0031)6){1}[1-9]{1}[0-9]{7})$/';
+  $regex_telephone_mobile = '/^(((\\+31|0|0031)6){1}[-]?[1-9]{1}[0-9]{7})$/';
   if (!(preg_match($regex_telephone_fixed, $values['telephone']) || preg_match($regex_telephone_mobile, $values['telephone']))) {
     form_set_error('telephone', 'Vul een geldig telefoonnummer in!');
   }
