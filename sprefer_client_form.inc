@@ -16,7 +16,7 @@ function sprefer_client_form($form, &$form_state, $machine_name) {
 
   $form['name'] = array(
     '#type' => 'textfield',
-    '#title' => 'Naam',
+    '#title' => 'Je naam',
     '#attributes' => array(
       'placeholder' => 'Bij voorkeur voornaam en achternaam',
     ),
@@ -59,7 +59,7 @@ function sprefer_client_form($form, &$form_state, $machine_name) {
       $address = array_pop($pro6pp['results']);
       $form_state['address'] = $address;
       $form['address_check'] = array(
-        '#markup' => '<p>Is het adres correct?</p><p>' . check_plain($values['name']) . '<br/>' . $address['street'] . ' ' . check_plain($values['house_number']) . '<br/>' . $address['city'] . '</p>'
+        '#markup' => '<p>Is de postcode correct? Wij vinden het volgende adres:</p><p>' . check_plain($values['name']) . '<br/>' . $address['street'] . ' ' . check_plain($values['house_number']) . '<br/>' . $address['city'] . '</p>'
       );
     }
     else {
@@ -90,7 +90,7 @@ function sprefer_client_form_validate($form, &$form_state) {
 
   // Check email.
   if (valid_email_address($values['email'])) {
-    $email_errors = _sp_email_verify_check($values['email']);
+    $email_errors = sp_validate_email($values['email']);
     if (!empty($email_errors)) {
       $mail_error = TRUE;
     }

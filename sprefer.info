@@ -4,5 +4,5 @@ core = 7.x
 package = sprbs
 dependencies[] = sprbs
 dependencies[] = spciviapi
-dependencies[] = spwebform_email_verify
+dependencies[] = sp_validate
 dependencies[] = spcivipush
